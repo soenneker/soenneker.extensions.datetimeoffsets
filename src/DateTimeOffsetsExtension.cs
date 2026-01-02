@@ -22,7 +22,7 @@ public static class DateTimeOffsetExtension
     /// <param name="dateTimeOffset">The <see cref="DateTimeOffset"/> to convert.</param>
     /// <returns>A UTC <see cref="System.DateTime"/> equivalent to the provided <see cref="DateTimeOffset"/>.</returns>
     [Pure]
-    public static DateTime ToUtcDateTime(this System.DateTimeOffset dateTimeOffset)
+    public static DateTime ToUtcDateTime(this DateTimeOffset dateTimeOffset)
     {
         return dateTimeOffset.UtcDateTime;
     }
@@ -35,7 +35,7 @@ public static class DateTimeOffsetExtension
     /// <returns>A <see cref="System.DateTimeOffset"/> instance representing the converted time in the specified time zone.</returns>
     /// <exception cref="ArgumentException">Thrown if <paramref name="tzInfo"/> is null.</exception>
     [Pure]
-    public static System.DateTimeOffset ToTz(this System.DateTimeOffset dateTimeOffset, TimeZoneInfo tzInfo)
+    public static DateTimeOffset ToTz(this DateTimeOffset dateTimeOffset, TimeZoneInfo tzInfo)
     {
         return TimeZoneInfo.ConvertTime(dateTimeOffset, tzInfo);
     }
@@ -46,7 +46,7 @@ public static class DateTimeOffsetExtension
     /// <param name="dateTimeOffset">The <see cref="DateTimeOffset"/> to convert to UTC.</param>
     /// <returns>A <see cref="System.DateTimeOffset"/> value that represents the same point in time, expressed in UTC.</returns>
     [Pure]
-    public static System.DateTimeOffset ToUtc(this System.DateTimeOffset dateTimeOffset)
+    public static DateTimeOffset ToUtc(this DateTimeOffset dateTimeOffset)
     {
         return dateTimeOffset.ToOffset(TimeSpan.Zero);
     }
@@ -60,9 +60,9 @@ public static class DateTimeOffsetExtension
     /// <returns>The age in the specified unit of time.</returns>
     /// <exception cref="NotSupportedException"></exception>
     [Pure]
-    public static double ToAge(this System.DateTimeOffset fromDateTimeOffset, UnitOfTime unitOfTime, System.DateTimeOffset? utcNow = null)
+    public static double ToAge(this DateTimeOffset fromDateTimeOffset, UnitOfTime unitOfTime, DateTimeOffset? utcNow = null)
     {
-        utcNow ??= System.DateTimeOffset.UtcNow;
+        utcNow ??= DateTimeOffset.UtcNow;
         TimeSpan timeSpan = utcNow.Value - fromDateTimeOffset;
 
         return unitOfTime.Value switch
@@ -87,14 +87,14 @@ public static class DateTimeOffsetExtension
     }
 
     [Pure]
-    public static double QuartersBetween(System.DateTimeOffset from, System.DateTimeOffset to)
+    public static double QuartersBetween(DateTimeOffset from, DateTimeOffset to)
     {
         if (to < from)
             (from, to) = (to, from);
 
         int whole = WholeQuartersBetween(from, to);
-        System.DateTimeOffset start = from.AddMonths(whole * 3);
-        System.DateTimeOffset end = start.AddMonths(3);
+        DateTimeOffset start = from.AddMonths(whole * 3);
+        DateTimeOffset end = start.AddMonths(3);
 
         if (start == to)
             return whole;
@@ -105,14 +105,14 @@ public static class DateTimeOffsetExtension
     }
 
     [Pure]
-    public static double YearsBetween(System.DateTimeOffset from, System.DateTimeOffset to)
+    public static double YearsBetween(DateTimeOffset from, DateTimeOffset to)
     {
         if (to < from)
             (from, to) = (to, from);
 
         int whole = WholeYearsBetween(from, to);
-        System.DateTimeOffset start = from.AddYears(whole);
-        System.DateTimeOffset end = start.AddYears(1);
+        DateTimeOffset start = from.AddYears(whole);
+        DateTimeOffset end = start.AddYears(1);
 
         if (start == to)
             return whole;
@@ -123,14 +123,14 @@ public static class DateTimeOffsetExtension
     }
 
     [Pure]
-    public static double MonthsBetween(System.DateTimeOffset from, System.DateTimeOffset to)
+    public static double MonthsBetween(DateTimeOffset from, DateTimeOffset to)
     {
         if (to < from)
             (from, to) = (to, from);
 
         int whole = WholeMonthsBetween(from, to);
-        System.DateTimeOffset start = from.AddMonths(whole);
-        System.DateTimeOffset end = start.AddMonths(1);
+        DateTimeOffset start = from.AddMonths(whole);
+        DateTimeOffset end = start.AddMonths(1);
 
         if (start == to)
             return whole;
@@ -141,7 +141,7 @@ public static class DateTimeOffsetExtension
     }
 
     [Pure]
-    public static int WholeMonthsBetween(System.DateTimeOffset from, System.DateTimeOffset to)
+    public static int WholeMonthsBetween(DateTimeOffset from, DateTimeOffset to)
     {
         if (to < from)
             (from, to) = (to, from);
@@ -149,7 +149,7 @@ public static class DateTimeOffsetExtension
         int months = (to.Year - from.Year) * 12 + (to.Month - from.Month);
 
         // If "to" hasn't reached the day/time of "from" within that month, back up 1
-        System.DateTimeOffset candidate = from.AddMonths(months);
+        DateTimeOffset candidate = from.AddMonths(months);
 
         if (candidate > to)
             months--;
@@ -158,13 +158,13 @@ public static class DateTimeOffsetExtension
     }
 
     [Pure]
-    public static int WholeYearsBetween(System.DateTimeOffset from, System.DateTimeOffset to)
+    public static int WholeYearsBetween(DateTimeOffset from, DateTimeOffset to)
     {
         if (to < from)
             (from, to) = (to, from);
 
         int years = to.Year - from.Year;
-        System.DateTimeOffset candidate = from.AddYears(years);
+        DateTimeOffset candidate = from.AddYears(years);
         if (candidate > to)
             years--;
 
@@ -172,7 +172,7 @@ public static class DateTimeOffsetExtension
     }
 
     [Pure]
-    public static int WholeQuartersBetween(System.DateTimeOffset from, System.DateTimeOffset to)
+    public static int WholeQuartersBetween(DateTimeOffset from, DateTimeOffset to)
     {
         if (to < from)
             (from, to) = (to, from);
@@ -181,7 +181,7 @@ public static class DateTimeOffsetExtension
         int toQ = (to.Month - 1) / 3;
 
         int quarters = (to.Year - from.Year) * 4 + (toQ - fromQ);
-        System.DateTimeOffset candidate = from.AddMonths(quarters * 3);
+        DateTimeOffset candidate = from.AddMonths(quarters * 3);
         if (candidate > to)
             quarters--;
 
@@ -193,9 +193,9 @@ public static class DateTimeOffsetExtension
     /// If <paramref name="zone"/> is <see langword="null"/>, the date’s own offset is used.
     /// </summary>
     [Pure]
-    public static bool IsBusinessDay(this System.DateTimeOffset dateTimeOffset, TimeZoneInfo? zone = null, CultureInfo? culture = null)
+    public static bool IsBusinessDay(this DateTimeOffset dateTimeOffset, TimeZoneInfo? zone = null, CultureInfo? culture = null)
     {
-        System.DateTimeOffset local = zone is null ? dateTimeOffset : TimeZoneInfo.ConvertTime(dateTimeOffset, zone);
+        DateTimeOffset local = zone is null ? dateTimeOffset : TimeZoneInfo.ConvertTime(dateTimeOffset, zone);
         DayOfWeek d = local.DayOfWeek;
 
         IReadOnlySet<DayOfWeek> weekendDays = (culture ?? CultureInfo.CurrentCulture).GetWeekendDays();
@@ -214,7 +214,7 @@ public static class DateTimeOffsetExtension
     /// </param>
     /// <param name="culture"></param>
     [Pure]
-    public static System.DateTimeOffset AddBusinessDays(this System.DateTimeOffset dateTimeOffset, int businessDays, TimeZoneInfo? zone = null,
+    public static DateTimeOffset AddBusinessDays(this DateTimeOffset dateTimeOffset, int businessDays, TimeZoneInfo? zone = null,
         CultureInfo? culture = null)
     {
         if (businessDays == 0)
@@ -222,7 +222,7 @@ public static class DateTimeOffsetExtension
 
         int direction = businessDays > 0 ? 1 : -1;
         int remaining = Math.Abs(businessDays);
-        System.DateTimeOffset current = dateTimeOffset;
+        DateTimeOffset current = dateTimeOffset;
 
         while (remaining > 0)
         {
@@ -239,7 +239,7 @@ public static class DateTimeOffsetExtension
     /// Checks whether the value is between <paramref name="start"/> and <paramref name="end"/>.
     /// </summary>
     [Pure]
-    public static bool IsBetween(this System.DateTimeOffset value, System.DateTimeOffset start, System.DateTimeOffset end, bool inclusive = true)
+    public static bool IsBetween(this DateTimeOffset value, DateTimeOffset start, DateTimeOffset end, bool inclusive = true)
     {
         if (start > end)
             (start, end) = (end, start);
@@ -260,9 +260,9 @@ public static class DateTimeOffsetExtension
     /// <param name="unitOfTime">The precision to which the <paramref name="dateTimeOffset"/> should be trimmed. This should be one of the values defined in <see cref="UnitOfTime"/>.</param>
     /// <returns>A new <see cref="System.DateTimeOffset"/> object trimmed to the specified <paramref name="unitOfTime"/>.</returns>
     [Pure]
-    public static System.DateTimeOffset Trim(this System.DateTimeOffset dateTimeOffset, UnitOfTime unitOfTime)
+    public static DateTimeOffset Trim(this DateTimeOffset dateTimeOffset, UnitOfTime unitOfTime)
     {
-        System.DateTimeOffset trimmed;
+        DateTimeOffset trimmed;
         TimeSpan offset = dateTimeOffset.Offset;
 
         switch (unitOfTime.Value)
@@ -271,29 +271,29 @@ public static class DateTimeOffsetExtension
                 {
                     long ticks = dateTimeOffset.Ticks;
                     long truncatedTicks = ticks - ticks % (long)_ticksPerMicrosecond;
-                    trimmed = new System.DateTimeOffset(truncatedTicks, offset);
+                    trimmed = new DateTimeOffset(truncatedTicks, offset);
                     break;
                 }
             case UnitOfTime.MillisecondValue:
                 {
                     long ticks = dateTimeOffset.Ticks;
                     long truncatedTicks = ticks - ticks % 10000;
-                    trimmed = new System.DateTimeOffset(truncatedTicks, offset);
+                    trimmed = new DateTimeOffset(truncatedTicks, offset);
                     break;
                 }
             case UnitOfTime.SecondValue:
-                trimmed = new System.DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day, dateTimeOffset.Hour, dateTimeOffset.Minute,
+                trimmed = new DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day, dateTimeOffset.Hour, dateTimeOffset.Minute,
                     dateTimeOffset.Second, 0, offset);
                 break;
             case UnitOfTime.MinuteValue:
-                trimmed = new System.DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day, dateTimeOffset.Hour, dateTimeOffset.Minute,
+                trimmed = new DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day, dateTimeOffset.Hour, dateTimeOffset.Minute,
                     0, 0, offset);
                 break;
             case UnitOfTime.HourValue:
-                trimmed = new System.DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day, dateTimeOffset.Hour, 0, 0, 0, offset);
+                trimmed = new DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day, dateTimeOffset.Hour, 0, 0, 0, offset);
                 break;
             case UnitOfTime.DayValue:
-                trimmed = new System.DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day, 0, 0, 0, 0, offset);
+                trimmed = new DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day, 0, 0, 0, 0, offset);
                 break;
             case UnitOfTime.WeekValue: // Considering Monday is the first day - ISO 8601
                 {
@@ -303,25 +303,25 @@ public static class DateTimeOffsetExtension
                         daysToSubtract += 7;
                     }
 
-                    trimmed = new System.DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day, 0, 0, 0, 0, offset).AddDays(-daysToSubtract);
+                    trimmed = new DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, dateTimeOffset.Day, 0, 0, 0, 0, offset).AddDays(-daysToSubtract);
                     break;
                 }
             case UnitOfTime.MonthValue:
-                trimmed = new System.DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, 1, 0, 0, 0, 0, offset);
+                trimmed = new DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, 1, 0, 0, 0, 0, offset);
                 break;
             case UnitOfTime.QuarterValue:
                 // Determine the start month of the quarter
                 int quarterNumber = (dateTimeOffset.Month - 1) / 3;
                 int startMonthOfQuarter = quarterNumber * 3 + 1;
-                trimmed = new System.DateTimeOffset(dateTimeOffset.Year, startMonthOfQuarter, 1, 0, 0, 0, 0, offset);
+                trimmed = new DateTimeOffset(dateTimeOffset.Year, startMonthOfQuarter, 1, 0, 0, 0, 0, offset);
                 break;
             case UnitOfTime.YearValue:
-                trimmed = new System.DateTimeOffset(dateTimeOffset.Year, 1, 1, 0, 0, 0, 0, offset);
+                trimmed = new DateTimeOffset(dateTimeOffset.Year, 1, 1, 0, 0, 0, 0, offset);
                 break;
             case UnitOfTime.DecadeValue:
                 // Calculate the start year of the decade
                 int startYearOfDecade = dateTimeOffset.Year - dateTimeOffset.Year % 10;
-                trimmed = new System.DateTimeOffset(startYearOfDecade, 1, 1, 0, 0, 0, 0, offset);
+                trimmed = new DateTimeOffset(startYearOfDecade, 1, 1, 0, 0, 0, 0, offset);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(unitOfTime), $"Unsupported UnitOfTime: {unitOfTime.Name}");
@@ -343,9 +343,9 @@ public static class DateTimeOffsetExtension
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">Thrown if an unsupported <paramref name="unitOfTime"/> is provided.</exception>
     [Pure]
-    public static System.DateTimeOffset TrimEnd(this System.DateTimeOffset dateTimeOffset, UnitOfTime unitOfTime)
+    public static DateTimeOffset TrimEnd(this DateTimeOffset dateTimeOffset, UnitOfTime unitOfTime)
     {
-        System.DateTimeOffset startOfPeriod = dateTimeOffset.Trim(unitOfTime);
+        DateTimeOffset startOfPeriod = dateTimeOffset.Trim(unitOfTime);
 
         startOfPeriod = unitOfTime.Value switch
         {
@@ -375,7 +375,7 @@ public static class DateTimeOffsetExtension
     /// <param name="unitOfTime">The unit of time to add, specified as a <see cref="UnitOfTime"/>.</param>
     /// <returns>A new <see cref="System.DateTimeOffset"/> object that is the result of adding the specified amount of time to the original date and time.</returns>
     [Pure]
-    public static System.DateTimeOffset Add(this System.DateTimeOffset dateTimeOffset, double value, UnitOfTime unitOfTime)
+    public static DateTimeOffset Add(this DateTimeOffset dateTimeOffset, double value, UnitOfTime unitOfTime)
     {
         switch (unitOfTime.Value)
         {
@@ -425,21 +425,21 @@ public static class DateTimeOffsetExtension
     }
 
     [Pure]
-    public static System.DateTimeOffset Subtract(this System.DateTimeOffset dateTimeOffset, double value, UnitOfTime unitOfTime)
+    public static DateTimeOffset Subtract(this DateTimeOffset dateTimeOffset, double value, UnitOfTime unitOfTime)
     {
         return dateTimeOffset.Add(-value, unitOfTime);
     }
 
     /// <inheritdoc cref="Trim(System.DateTimeOffset, UnitOfTime)"/>
     [Pure]
-    public static System.DateTimeOffset ToStartOf(this System.DateTimeOffset dateTimeOffset, UnitOfTime unitOfTime)
+    public static DateTimeOffset ToStartOf(this DateTimeOffset dateTimeOffset, UnitOfTime unitOfTime)
     {
         return Trim(dateTimeOffset, unitOfTime);
     }
 
     /// <inheritdoc cref="TrimEnd(System.DateTimeOffset, UnitOfTime)"/>
     [Pure]
-    public static System.DateTimeOffset ToEndOf(this System.DateTimeOffset dateTimeOffset, UnitOfTime unitOfTime)
+    public static DateTimeOffset ToEndOf(this DateTimeOffset dateTimeOffset, UnitOfTime unitOfTime)
     {
         return TrimEnd(dateTimeOffset, unitOfTime);
     }
@@ -462,7 +462,7 @@ public static class DateTimeOffsetExtension
     /// </remarks>
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int ToDateAsInteger(this System.DateTimeOffset dateTimeOffset) =>
+    public static int ToDateAsInteger(this DateTimeOffset dateTimeOffset) =>
         dateTimeOffset.Year * 10000 + dateTimeOffset.Month * 100 + dateTimeOffset.Day;
 
     /// <summary>
@@ -476,7 +476,7 @@ public static class DateTimeOffsetExtension
     /// <param name="timeZoneInfo">The time zone to calculate the offset against.</param>
     /// <returns>The time zone offset in hours from UTC. Time zones west of UTC return negative values. i.e. Eastern returns a negative value (-4, or -5)</returns>
     [Pure]
-    public static int ToTzOffsetHours(this System.DateTimeOffset dateTimeOffset, TimeZoneInfo timeZoneInfo)
+    public static int ToTzOffsetHours(this DateTimeOffset dateTimeOffset, TimeZoneInfo timeZoneInfo)
     {
         return dateTimeOffset.ToTzOffset(timeZoneInfo)
                              .Hours;
@@ -492,9 +492,9 @@ public static class DateTimeOffsetExtension
     /// <param name="dateTimeOffset">The DateTimeOffset to calculate the offset for.</param>
     /// <param name="timeZoneInfo">The time zone to calculate the offset for.</param>
     [Pure]
-    public static TimeSpan ToTzOffset(this System.DateTimeOffset dateTimeOffset, TimeZoneInfo timeZoneInfo)
+    public static TimeSpan ToTzOffset(this DateTimeOffset dateTimeOffset, TimeZoneInfo timeZoneInfo)
     {
-        System.DateTimeOffset converted = TimeZoneInfo.ConvertTime(dateTimeOffset, timeZoneInfo);
+        DateTimeOffset converted = TimeZoneInfo.ConvertTime(dateTimeOffset, timeZoneInfo);
         return timeZoneInfo.GetUtcOffset(converted.DateTime);
     }
 
@@ -511,7 +511,7 @@ public static class DateTimeOffsetExtension
     /// <param name="timeZoneInfo">The time zone of the original hour.</param>
     /// <returns>The hour in UTC after conversion. This is always a positive number in the 24-hour format, where 24 may indicate midnight.</returns>
     [Pure]
-    public static int ToUtcHoursFromTz(this System.DateTimeOffset dateTimeOffset, int tzHour, TimeZoneInfo timeZoneInfo)
+    public static int ToUtcHoursFromTz(this DateTimeOffset dateTimeOffset, int tzHour, TimeZoneInfo timeZoneInfo)
     {
         int utcHoursOffset = dateTimeOffset.ToTzOffsetHours(timeZoneInfo);
 
@@ -527,11 +527,11 @@ public static class DateTimeOffsetExtension
     /// Subtracts an amount (delay) of time (endAt), and then subtracts another amount (subtraction) of time (startAt).
     /// </summary>
     [Pure]
-    public static (System.DateTimeOffset startAt, System.DateTimeOffset endAt) ToWindow(this System.DateTimeOffset dateTimeOffset, int delay, int subtraction,
+    public static (DateTimeOffset startAt, DateTimeOffset endAt) ToWindow(this DateTimeOffset dateTimeOffset, int delay, int subtraction,
         UnitOfTime unitOfTime)
     {
-        System.DateTimeOffset endAt = dateTimeOffset.Subtract(delay, unitOfTime);
-        System.DateTimeOffset startAt = endAt.Subtract(subtraction, unitOfTime);
+        DateTimeOffset endAt = dateTimeOffset.Subtract(delay, unitOfTime);
+        DateTimeOffset startAt = endAt.Subtract(subtraction, unitOfTime);
 
         return (startAt, endAt);
     }
@@ -542,7 +542,7 @@ public static class DateTimeOffsetExtension
     /// <param name="dateTimeOffset">The <see cref="System.DateTimeOffset"/> to convert.</param>
     /// <returns>A <see cref="DateOnly"/> representing the date portion of the input.</returns>
     [Pure]
-    public static DateOnly ToDateOnly(this System.DateTimeOffset dateTimeOffset)
+    public static DateOnly ToDateOnly(this DateTimeOffset dateTimeOffset)
     {
         return DateOnly.FromDateTime(dateTimeOffset.Date);
     }
