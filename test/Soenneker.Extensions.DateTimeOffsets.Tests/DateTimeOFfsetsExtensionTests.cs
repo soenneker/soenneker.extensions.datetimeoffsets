@@ -3,7 +3,6 @@ using System.Globalization;
 using Soenneker.Enums.UnitOfTime;
 using Soenneker.Extensions.DateTimeOffsets;
 using Soenneker.Tests.Unit;
-using Xunit;
 
 namespace Soenneker.Extensions.DateTimeOffsets.Tests;
 
@@ -13,14 +12,14 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         TimeZoneInfo.FindSystemTimeZoneById(
             OperatingSystem.IsWindows() ? "Eastern Standard Time" : "America/New_York");
 
-    [Fact]
+    [Test]
     public void ToTz_throws_when_tz_is_null()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
         Assert.Throws<ArgumentNullException>(() => dto.ToTz(null!));
     }
 
-    [Fact]
+    [Test]
     public void ToUtc_preserves_instant()
     {
         var withOffset = new DateTimeOffset(2024, 6, 15, 8, 0, 0, TimeSpan.FromHours(-4));
@@ -30,7 +29,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(12, utc.Hour);
     }
 
-    [Fact]
+    [Test]
     public void ToAge_same_instant_returns_zero()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
@@ -38,7 +37,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(0, age);
     }
 
-    [Fact]
+    [Test]
     public void ToAge_reversed_returns_negative()
     {
         var from = new DateTimeOffset(2024, 6, 20, 0, 0, 0, TimeSpan.Zero);
@@ -48,7 +47,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(-5, age, precision: 0);
     }
 
-    [Fact]
+    [Test]
     public void ToAge_month_unit_across_leap_year_february()
     {
         var from = new DateTimeOffset(2024, 2, 15, 0, 0, 0, TimeSpan.Zero);
@@ -58,14 +57,14 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.True(months <= 1.1);
     }
 
-    [Fact]
+    [Test]
     public void MonthsBetween_same_instant_returns_zero()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 30, 0, TimeSpan.Zero);
         Assert.Equal(0d, DateTimeOffsetExtension.MonthsBetween(dto, dto));
     }
 
-    [Fact]
+    [Test]
     public void MonthsBetween_reversed_order_returns_negative()
     {
         var from = new DateTimeOffset(2024, 8, 1, 0, 0, 0, TimeSpan.Zero);
@@ -74,7 +73,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.True(m < 0);
     }
 
-    [Fact]
+    [Test]
     public void WholeMonthsBetween_jan_31_to_mar_30_returns_one()
     {
         var from = new DateTimeOffset(2024, 1, 31, 0, 0, 0, TimeSpan.Zero);
@@ -83,14 +82,14 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(1, whole);
     }
 
-    [Fact]
+    [Test]
     public void YearsBetween_same_instant_returns_zero()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 0, 0, 0, TimeSpan.Zero);
         Assert.Equal(0d, DateTimeOffsetExtension.YearsBetween(dto, dto));
     }
 
-    [Fact]
+    [Test]
     public void QuartersBetween_reversed_returns_negative()
     {
         var from = new DateTimeOffset(2024, 10, 1, 0, 0, 0, TimeSpan.Zero);
@@ -99,7 +98,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.True(q < 0);
     }
 
-    [Fact]
+    [Test]
     public void IsBusinessDay_with_null_zone_uses_offset_day_of_week()
     {
         var saturday = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero); // Saturday
@@ -107,7 +106,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.False(isBusiness);
     }
 
-    [Fact]
+    [Test]
     public void AddBusinessDays_zero_returns_same_value()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
@@ -115,7 +114,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(dto, result);
     }
 
-    [Fact]
+    [Test]
     public void AddBusinessDays_negative_goes_backward()
     {
         var friday = new DateTimeOffset(2024, 6, 14, 12, 0, 0, TimeSpan.Zero);
@@ -124,7 +123,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(DayOfWeek.Thursday, result.DayOfWeek);
     }
 
-    [Fact]
+    [Test]
     public void IsBetween_reversed_start_end_swaps_internally()
     {
         var start = new DateTimeOffset(2024, 6, 20, 0, 0, 0, TimeSpan.Zero);
@@ -133,7 +132,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.True(value.IsBetween(start, end, inclusive: true));
     }
 
-    [Fact]
+    [Test]
     public void IsBetween_exclusive_excludes_boundaries()
     {
         var start = new DateTimeOffset(2024, 6, 10, 0, 0, 0, TimeSpan.Zero);
@@ -143,7 +142,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.True(new DateTimeOffset(2024, 6, 15, 0, 0, 0, TimeSpan.Zero).IsBetween(start, end, inclusive: false));
     }
 
-    [Fact]
+    [Test]
     public void Trim_decade_rounds_down_year()
     {
         var dto = new DateTimeOffset(2025, 7, 15, 12, 30, 0, TimeSpan.Zero);
@@ -154,7 +153,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(0, trimmed.Hour);
     }
 
-    [Fact]
+    [Test]
     public void Trim_quarter_first_month_of_quarter()
     {
         var dto = new DateTimeOffset(2024, 5, 20, 12, 0, 0, TimeSpan.Zero);
@@ -164,7 +163,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(1, trimmed.Day);
     }
 
-    [Fact]
+    [Test]
     public void TrimEnd_month_last_tick_of_month()
     {
         var dto = new DateTimeOffset(2024, 2, 15, 12, 0, 0, TimeSpan.Zero);
@@ -177,7 +176,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(59, endOfMonth.Second);
     }
 
-    [Fact]
+    [Test]
     public void Trim_week_monday_start()
     {
         var wednesday = new DateTimeOffset(2024, 6, 12, 14, 0, 0, TimeSpan.Zero);
@@ -187,7 +186,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(0, startOfWeek.Minute);
     }
 
-    [Fact]
+    [Test]
     public void Add_zero_returns_same()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
@@ -195,7 +194,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(dto, dto.Add(0, UnitOfTime.Month));
     }
 
-    [Fact]
+    [Test]
     public void Subtract_positive_value_goes_backward()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
@@ -204,7 +203,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(13, result.Day);
     }
 
-    [Fact]
+    [Test]
     public void Add_fractional_month_uses_days_in_month()
     {
         var dto = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
@@ -216,7 +215,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(12, result.Hour);
     }
 
-    [Fact]
+    [Test]
     public void ToDateAsInteger_min_value()
     {
         var dto = DateTimeOffset.MinValue;
@@ -224,7 +223,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(10101, ymd);
     }
 
-    [Fact]
+    [Test]
     public void ToDateAsInteger_max_value()
     {
         var dto = DateTimeOffset.MaxValue;
@@ -232,21 +231,21 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(99991231, ymd);
     }
 
-    [Fact]
+    [Test]
     public void ToTzOffset_throws_when_tz_is_null()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
         Assert.Throws<ArgumentNullException>(() => dto.ToTzOffset(null!));
     }
 
-    [Fact]
+    [Test]
     public void ToUtcHoursFromTz_throws_when_tz_is_null()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
         Assert.Throws<ArgumentNullException>(() => dto.ToUtcHoursFromTz(14, null!));
     }
 
-    [Fact]
+    [Test]
     public void ToUtcHoursFromTz_throws_when_tzHour_out_of_range()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
@@ -254,7 +253,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Throws<ArgumentOutOfRangeException>(() => dto.ToUtcHoursFromTz(-1, TimeZoneInfo.Utc));
     }
 
-    [Fact]
+    [Test]
     public void ToUtcHoursFromTz_UTC_returns_same_hour()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 14, 0, 0, TimeSpan.Zero);
@@ -262,7 +261,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(14, utcHour);
     }
 
-    [Fact]
+    [Test]
     public void ToWindow_delay_and_subtraction_applied()
     {
         var now = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
@@ -271,7 +270,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(13, endAt.Day);
     }
 
-    [Fact]
+    [Test]
     public void ToDateOnly_strips_time()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 23, 59, 59, TimeSpan.Zero);
@@ -281,7 +280,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         Assert.Equal(15, date.Day);
     }
 
-    [Fact]
+    [Test]
     public void ToStartOf_and_ToEndOf_match_Trim_and_TrimEnd()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 14, 30, 45, TimeSpan.Zero);
