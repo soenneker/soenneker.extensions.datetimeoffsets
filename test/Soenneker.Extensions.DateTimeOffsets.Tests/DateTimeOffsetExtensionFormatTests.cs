@@ -1,4 +1,5 @@
 using System;
+using AwesomeAssertions;
 using Soenneker.Extensions.DateTimeOffsets;
 using Soenneker.Tests.Unit;
 
@@ -22,7 +23,7 @@ public sealed class DateTimeOffsetExtensionFormatTests : UnitTest
     {
         var dto = DateTimeOffset.MinValue;
         string result = dto.ToPreciseFormat();
-        Assert.Contains("0001-01-01", result);
+        result.Should().Contain("0001-01-01");
     }
 
     [Test]
@@ -30,14 +31,14 @@ public sealed class DateTimeOffsetExtensionFormatTests : UnitTest
     {
         var dto = DateTimeOffset.MaxValue;
         string result = dto.ToPreciseFormat();
-        Assert.Contains("9999-12-31", result);
+        result.Should().Contain("9999-12-31");
     }
 
     [Test]
     public void ToMonthFirstDateFormat_midnight()
     {
         var dto = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
-        Assert.Equal("01-01-2024", dto.ToMonthFirstDateFormat());
+        dto.ToMonthFirstDateFormat().Should().Be("01-01-2024");
     }
 
     [Test]
@@ -45,14 +46,14 @@ public sealed class DateTimeOffsetExtensionFormatTests : UnitTest
     {
         var utc = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
         var est = new DateTimeOffset(2024, 6, 15, 8, 0, 0, TimeSpan.FromHours(-4));
-        Assert.Equal(utc.ToPreciseUtcFormat(), est.ToPreciseUtcFormat());
+        est.ToPreciseUtcFormat().Should().Be(utc.ToPreciseUtcFormat());
     }
 
     [Test]
     public void ToIso8601_and_ToWebString_are_equal()
     {
         var dto = new DateTimeOffset(2024, 3, 2, 10, 30, 45, 123, TimeSpan.Zero);
-        Assert.Equal(dto.ToIso8601(), dto.ToWebString());
+        dto.ToWebString().Should().Be(dto.ToIso8601());
     }
 
     [Test]
@@ -60,7 +61,7 @@ public sealed class DateTimeOffsetExtensionFormatTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.FromHours(5));
         string result = dto.ToIso8601();
-        Assert.EndsWith("Z", result);
+        result.Should().EndWith("Z");
     }
 
     [Test]
@@ -77,7 +78,7 @@ public sealed class DateTimeOffsetExtensionFormatTests : UnitTest
         TimeZoneInfo tz = GetEastern();
         string result = utc.ToTzDateFormat(tz);
         // In EDT (UTC-4), 03:00 UTC = 23:00 on 15th
-        Assert.Equal("06/15/2024", result);
+        result.Should().Be("06/15/2024");
     }
 
     [Test]
@@ -99,7 +100,7 @@ public sealed class DateTimeOffsetExtensionFormatTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.FromHours(-4));
         string result = dto.ToUtcDateTimeFormat();
-        Assert.Contains("UTC", result);
+        result.Should().Contain("UTC");
     }
 
     [Test]
@@ -114,9 +115,9 @@ public sealed class DateTimeOffsetExtensionFormatTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 30, 45, TimeSpan.Zero);
         string result = dto.ToFileName();
-        Assert.DoesNotContain(" ", result);
-        Assert.DoesNotContain(":", result);
-        Assert.Contains("--", result);
+        result.Should().NotContain(" ");
+        result.Should().NotContain(":");
+        result.Should().Contain("--");
     }
 
     [Test]
@@ -124,7 +125,7 @@ public sealed class DateTimeOffsetExtensionFormatTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 3, 2, 0, 0, 0, TimeSpan.Zero);
         string result = dto.ToShortMonthDayYearString();
-        Assert.StartsWith("Mar", result);
+        result.Should().StartWith("Mar");
     }
 
     [Test]
@@ -132,7 +133,7 @@ public sealed class DateTimeOffsetExtensionFormatTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 3, 2, 0, 0, 0, TimeSpan.Zero);
         string result = dto.ToLongMonthDayYearString();
-        Assert.StartsWith("March", result);
+        result.Should().StartWith("March");
     }
 
     [Test]
@@ -140,8 +141,8 @@ public sealed class DateTimeOffsetExtensionFormatTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
         string result = dto.ToHourFormat(TimeZoneInfo.Utc);
-        Assert.Contains("12", result);
-        Assert.Contains("PM", result);
+        result.Should().Contain("12");
+        result.Should().Contain("PM");
     }
 
     [Test]
@@ -149,7 +150,7 @@ public sealed class DateTimeOffsetExtensionFormatTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 6, 16, 0, 0, 0, TimeSpan.Zero);
         string result = dto.ToHourFormat(TimeZoneInfo.Utc);
-        Assert.Contains("12", result);
-        Assert.Contains("AM", result);
+        result.Should().Contain("12");
+        result.Should().Contain("AM");
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using AwesomeAssertions;
 using Soenneker.Enums.UnitOfTime;
 using Soenneker.Extensions.DateTimeOffsets;
 using Soenneker.Tests.Unit;
@@ -24,9 +25,9 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var withOffset = new DateTimeOffset(2024, 6, 15, 8, 0, 0, TimeSpan.FromHours(-4));
         DateTimeOffset utc = withOffset.ToUtc();
-        Assert.Equal(TimeSpan.Zero, utc.Offset);
-        Assert.Equal(2024, utc.Year);
-        Assert.Equal(12, utc.Hour);
+        utc.Offset.Should().Be(TimeSpan.Zero);
+        utc.Year.Should().Be(2024);
+        utc.Hour.Should().Be(12);
     }
 
     [Test]
@@ -34,7 +35,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
         double age = dto.ToAge(UnitOfTime.Day, dto);
-        Assert.Equal(0, age);
+        age.Should().Be(0);
     }
 
     [Test]
@@ -43,8 +44,8 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         var from = new DateTimeOffset(2024, 6, 20, 0, 0, 0, TimeSpan.Zero);
         var to = new DateTimeOffset(2024, 6, 15, 0, 0, 0, TimeSpan.Zero);
         double age = from.ToAge(UnitOfTime.Day, to);
-        Assert.True(age < 0);
-        Assert.Equal(-5, age, precision: 0);
+        age.Should().BeLessThan(0);
+        age.Should().BeApproximately(-5, 0.5);
     }
 
     [Test]
@@ -53,15 +54,15 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         var from = new DateTimeOffset(2024, 2, 15, 0, 0, 0, TimeSpan.Zero);
         var to = new DateTimeOffset(2024, 3, 15, 0, 0, 0, TimeSpan.Zero);
         double months = from.ToAge(UnitOfTime.Month, to);
-        Assert.True(months > 0);
-        Assert.True(months <= 1.1);
+        months.Should().BeGreaterThan(0);
+        months.Should().BeLessThanOrEqualTo(1.1);
     }
 
     [Test]
     public void MonthsBetween_same_instant_returns_zero()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 30, 0, TimeSpan.Zero);
-        Assert.Equal(0d, DateTimeOffsetExtension.MonthsBetween(dto, dto));
+        DateTimeOffsetExtension.MonthsBetween(dto, dto).Should().Be(0d);
     }
 
     [Test]
@@ -70,7 +71,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         var from = new DateTimeOffset(2024, 8, 1, 0, 0, 0, TimeSpan.Zero);
         var to = new DateTimeOffset(2024, 6, 1, 0, 0, 0, TimeSpan.Zero);
         double m = DateTimeOffsetExtension.MonthsBetween(from, to);
-        Assert.True(m < 0);
+        m.Should().BeLessThan(0);
     }
 
     [Test]
@@ -79,14 +80,14 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         var from = new DateTimeOffset(2024, 1, 31, 0, 0, 0, TimeSpan.Zero);
         var to = new DateTimeOffset(2024, 3, 30, 0, 0, 0, TimeSpan.Zero);
         int whole = DateTimeOffsetExtension.WholeMonthsBetween(from, to);
-        Assert.Equal(1, whole);
+        whole.Should().Be(1);
     }
 
     [Test]
     public void YearsBetween_same_instant_returns_zero()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 0, 0, 0, TimeSpan.Zero);
-        Assert.Equal(0d, DateTimeOffsetExtension.YearsBetween(dto, dto));
+        DateTimeOffsetExtension.YearsBetween(dto, dto).Should().Be(0d);
     }
 
     [Test]
@@ -95,7 +96,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         var from = new DateTimeOffset(2024, 10, 1, 0, 0, 0, TimeSpan.Zero);
         var to = new DateTimeOffset(2024, 4, 1, 0, 0, 0, TimeSpan.Zero);
         double q = DateTimeOffsetExtension.QuartersBetween(from, to);
-        Assert.True(q < 0);
+        q.Should().BeLessThan(0);
     }
 
     [Test]
@@ -103,7 +104,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var saturday = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero); // Saturday
         bool isBusiness = saturday.IsBusinessDay(zone: null, CultureInfo.InvariantCulture);
-        Assert.False(isBusiness);
+        isBusiness.Should().BeFalse();
     }
 
     [Test]
@@ -111,7 +112,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
         DateTimeOffset result = dto.AddBusinessDays(0);
-        Assert.Equal(dto, result);
+        result.Should().Be(dto);
     }
 
     [Test]
@@ -119,8 +120,8 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var friday = new DateTimeOffset(2024, 6, 14, 12, 0, 0, TimeSpan.Zero);
         DateTimeOffset result = friday.AddBusinessDays(-1);
-        Assert.True(result < friday);
-        Assert.Equal(DayOfWeek.Thursday, result.DayOfWeek);
+        (result < friday).Should().BeTrue();
+        result.DayOfWeek.Should().Be(DayOfWeek.Thursday);
     }
 
     [Test]
@@ -129,7 +130,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
         var start = new DateTimeOffset(2024, 6, 20, 0, 0, 0, TimeSpan.Zero);
         var end = new DateTimeOffset(2024, 6, 10, 0, 0, 0, TimeSpan.Zero);
         var value = new DateTimeOffset(2024, 6, 15, 0, 0, 0, TimeSpan.Zero);
-        Assert.True(value.IsBetween(start, end, inclusive: true));
+        value.IsBetween(start, end, inclusive: true).Should().BeTrue();
     }
 
     [Test]
@@ -137,9 +138,9 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var start = new DateTimeOffset(2024, 6, 10, 0, 0, 0, TimeSpan.Zero);
         var end = new DateTimeOffset(2024, 6, 20, 0, 0, 0, TimeSpan.Zero);
-        Assert.False(start.IsBetween(start, end, inclusive: false));
-        Assert.False(end.IsBetween(start, end, inclusive: false));
-        Assert.True(new DateTimeOffset(2024, 6, 15, 0, 0, 0, TimeSpan.Zero).IsBetween(start, end, inclusive: false));
+        start.IsBetween(start, end, inclusive: false).Should().BeFalse();
+        end.IsBetween(start, end, inclusive: false).Should().BeFalse();
+        new DateTimeOffset(2024, 6, 15, 0, 0, 0, TimeSpan.Zero).IsBetween(start, end, inclusive: false).Should().BeTrue();
     }
 
     [Test]
@@ -147,10 +148,10 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var dto = new DateTimeOffset(2025, 7, 15, 12, 30, 0, TimeSpan.Zero);
         DateTimeOffset trimmed = dto.Trim(UnitOfTime.Decade);
-        Assert.Equal(2020, trimmed.Year);
-        Assert.Equal(1, trimmed.Month);
-        Assert.Equal(1, trimmed.Day);
-        Assert.Equal(0, trimmed.Hour);
+        trimmed.Year.Should().Be(2020);
+        trimmed.Month.Should().Be(1);
+        trimmed.Day.Should().Be(1);
+        trimmed.Hour.Should().Be(0);
     }
 
     [Test]
@@ -158,9 +159,9 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 5, 20, 12, 0, 0, TimeSpan.Zero);
         DateTimeOffset trimmed = dto.Trim(UnitOfTime.Quarter);
-        Assert.Equal(2024, trimmed.Year);
-        Assert.Equal(4, trimmed.Month);
-        Assert.Equal(1, trimmed.Day);
+        trimmed.Year.Should().Be(2024);
+        trimmed.Month.Should().Be(4);
+        trimmed.Day.Should().Be(1);
     }
 
     [Test]
@@ -168,12 +169,12 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 2, 15, 12, 0, 0, TimeSpan.Zero);
         DateTimeOffset endOfMonth = dto.TrimEnd(UnitOfTime.Month);
-        Assert.Equal(2024, endOfMonth.Year);
-        Assert.Equal(2, endOfMonth.Month);
-        Assert.Equal(29, endOfMonth.Day); // 2024 leap year
-        Assert.Equal(23, endOfMonth.Hour);
-        Assert.Equal(59, endOfMonth.Minute);
-        Assert.Equal(59, endOfMonth.Second);
+        endOfMonth.Year.Should().Be(2024);
+        endOfMonth.Month.Should().Be(2);
+        endOfMonth.Day.Should().Be(29); // 2024 leap year
+        endOfMonth.Hour.Should().Be(23);
+        endOfMonth.Minute.Should().Be(59);
+        endOfMonth.Second.Should().Be(59);
     }
 
     [Test]
@@ -181,17 +182,17 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var wednesday = new DateTimeOffset(2024, 6, 12, 14, 0, 0, TimeSpan.Zero);
         DateTimeOffset startOfWeek = wednesday.Trim(UnitOfTime.Week);
-        Assert.Equal(DayOfWeek.Monday, startOfWeek.DayOfWeek);
-        Assert.Equal(0, startOfWeek.Hour);
-        Assert.Equal(0, startOfWeek.Minute);
+        startOfWeek.DayOfWeek.Should().Be(DayOfWeek.Monday);
+        startOfWeek.Hour.Should().Be(0);
+        startOfWeek.Minute.Should().Be(0);
     }
 
     [Test]
     public void Add_zero_returns_same()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
-        Assert.Equal(dto, dto.Add(0, UnitOfTime.Day));
-        Assert.Equal(dto, dto.Add(0, UnitOfTime.Month));
+        dto.Add(0, UnitOfTime.Day).Should().Be(dto);
+        dto.Add(0, UnitOfTime.Month).Should().Be(dto);
     }
 
     [Test]
@@ -199,8 +200,8 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
         DateTimeOffset result = dto.Subtract(2, UnitOfTime.Day);
-        Assert.True(result < dto);
-        Assert.Equal(13, result.Day);
+        (result < dto).Should().BeTrue();
+        result.Day.Should().Be(13);
     }
 
     [Test]
@@ -208,11 +209,11 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero);
         DateTimeOffset result = dto.Add(0.5, UnitOfTime.Month);
-        Assert.Equal(2024, result.Year);
-        Assert.Equal(1, result.Month);
+        result.Year.Should().Be(2024);
+        result.Month.Should().Be(1);
         // 0.5 * 31 days = 15.5 days → Jan 16 12:00
-        Assert.Equal(16, result.Day);
-        Assert.Equal(12, result.Hour);
+        result.Day.Should().Be(16);
+        result.Hour.Should().Be(12);
     }
 
     [Test]
@@ -220,7 +221,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var dto = DateTimeOffset.MinValue;
         int ymd = dto.ToDateAsInteger();
-        Assert.Equal(10101, ymd);
+        ymd.Should().Be(10101);
     }
 
     [Test]
@@ -228,7 +229,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var dto = DateTimeOffset.MaxValue;
         int ymd = dto.ToDateAsInteger();
-        Assert.Equal(99991231, ymd);
+        ymd.Should().Be(99991231);
     }
 
     [Test]
@@ -258,7 +259,7 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 6, 15, 14, 0, 0, TimeSpan.Zero);
         int utcHour = dto.ToUtcHoursFromTz(14, TimeZoneInfo.Utc);
-        Assert.Equal(14, utcHour);
+        utcHour.Should().Be(14);
     }
 
     [Test]
@@ -266,8 +267,8 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var now = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
         (DateTimeOffset startAt, DateTimeOffset endAt) = now.ToWindow(2, 3, UnitOfTime.Day);
-        Assert.Equal(10, startAt.Day);
-        Assert.Equal(13, endAt.Day);
+        startAt.Day.Should().Be(10);
+        endAt.Day.Should().Be(13);
     }
 
     [Test]
@@ -275,16 +276,16 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     {
         var dto = new DateTimeOffset(2024, 6, 15, 23, 59, 59, TimeSpan.Zero);
         DateOnly date = dto.ToDateOnly();
-        Assert.Equal(2024, date.Year);
-        Assert.Equal(6, date.Month);
-        Assert.Equal(15, date.Day);
+        date.Year.Should().Be(2024);
+        date.Month.Should().Be(6);
+        date.Day.Should().Be(15);
     }
 
     [Test]
     public void ToStartOf_and_ToEndOf_match_Trim_and_TrimEnd()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 14, 30, 45, TimeSpan.Zero);
-        Assert.Equal(dto.Trim(UnitOfTime.Day), dto.ToStartOf(UnitOfTime.Day));
-        Assert.Equal(dto.TrimEnd(UnitOfTime.Day), dto.ToEndOf(UnitOfTime.Day));
+        dto.ToStartOf(UnitOfTime.Day).Should().Be(dto.Trim(UnitOfTime.Day));
+        dto.ToEndOf(UnitOfTime.Day).Should().Be(dto.TrimEnd(UnitOfTime.Day));
     }
 }
