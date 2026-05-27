@@ -86,7 +86,8 @@ public static class DateTimeOffsetExtension
     /// <returns>The elapsed time expressed in <paramref name="unitOfTime"/>.</returns>
     /// <exception cref="NotSupportedException">Thrown when <paramref name="unitOfTime"/> is not supported.</exception>
     [Pure]
-    public static double ToAge(this DateTimeOffset fromDateTimeOffset, UnitOfTime unitOfTime, DateTimeOffset? utcNow = null)
+    public static double ToAge(this DateTimeOffset fromDateTimeOffset, UnitOfTime unitOfTime,
+        DateTimeOffset? utcNow = null)
     {
         utcNow ??= DateTimeOffset.UtcNow;
         DateTimeOffset to = utcNow.Value;
@@ -289,7 +290,8 @@ public static class DateTimeOffsetExtension
     /// </param>
     /// <returns><see langword="true"/> if the local date is a business day; otherwise <see langword="false"/>.</returns>
     [Pure]
-    public static bool IsBusinessDay(this DateTimeOffset dateTimeOffset, TimeZoneInfo? zone = null, CultureInfo? culture = null)
+    public static bool IsBusinessDay(this DateTimeOffset dateTimeOffset, TimeZoneInfo? zone = null,
+        CultureInfo? culture = null)
     {
         // Pull weekend definition once (culture extension may allocate; do not call per-loop in AddBusinessDays).
         IReadOnlySet<DayOfWeek> weekendDays = (culture ?? CultureInfo.CurrentCulture).GetWeekendDays();
@@ -320,7 +322,8 @@ public static class DateTimeOffsetExtension
     /// </param>
     /// <returns>The resulting <see cref="DateTimeOffset"/> after adding business days.</returns>
     [Pure]
-    public static DateTimeOffset AddBusinessDays(this DateTimeOffset dateTimeOffset, int businessDays, TimeZoneInfo? zone = null, CultureInfo? culture = null)
+    public static DateTimeOffset AddBusinessDays(this DateTimeOffset dateTimeOffset, int businessDays,
+        TimeZoneInfo? zone = null, CultureInfo? culture = null)
     {
         if (businessDays == 0)
             return dateTimeOffset;
@@ -336,9 +339,7 @@ public static class DateTimeOffsetExtension
         {
             current = current.AddDays(direction);
 
-            DayOfWeek day = zone is null
-                ? current.DayOfWeek
-                : TimeZoneInfo.ConvertTime(current, zone).DayOfWeek;
+            DayOfWeek day = zone is null ? current.DayOfWeek : TimeZoneInfo.ConvertTime(current, zone).DayOfWeek;
 
             if (!weekendDays.Contains(day))
                 remaining--;
@@ -359,7 +360,8 @@ public static class DateTimeOffsetExtension
     /// <returns><see langword="true"/> if the value lies within the range; otherwise <see langword="false"/>.</returns>
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsBetween(this DateTimeOffset value, DateTimeOffset start, DateTimeOffset end, bool inclusive = true)
+    public static bool IsBetween(this DateTimeOffset value, DateTimeOffset start, DateTimeOffset end,
+        bool inclusive = true)
     {
         if (start > end)
             (start, end) = (end, start);
@@ -399,10 +401,13 @@ public static class DateTimeOffsetExtension
             UnitOfTime.WeekValue => new DateTimeOffset(ticks - (ticks % _ticksPerDay), offset).AddDays(
                 -((7 + (int)dateTimeOffset.DayOfWeek - (int)DayOfWeek.Monday) % 7)),
 
-            UnitOfTime.MonthValue => new DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, 1, 0, 0, 0, 0, offset),
-            UnitOfTime.QuarterValue => new DateTimeOffset(dateTimeOffset.Year, ((dateTimeOffset.Month - 1) / 3 * 3) + 1, 1, 0, 0, 0, 0, offset),
+            UnitOfTime.MonthValue => new DateTimeOffset(dateTimeOffset.Year, dateTimeOffset.Month, 1, 0, 0, 0, 0,
+                offset),
+            UnitOfTime.QuarterValue => new DateTimeOffset(dateTimeOffset.Year, ((dateTimeOffset.Month - 1) / 3 * 3) + 1,
+                1, 0, 0, 0, 0, offset),
             UnitOfTime.YearValue => new DateTimeOffset(dateTimeOffset.Year, 1, 1, 0, 0, 0, 0, offset),
-            UnitOfTime.DecadeValue => new DateTimeOffset(dateTimeOffset.Year - (dateTimeOffset.Year % 10), 1, 1, 0, 0, 0, 0, offset),
+            UnitOfTime.DecadeValue => new DateTimeOffset(dateTimeOffset.Year - (dateTimeOffset.Year % 10), 1, 1, 0, 0,
+                0, 0, offset),
 
             _ => throw new ArgumentOutOfRangeException(nameof(unitOfTime), $"Unsupported UnitOfTime: {unitOfTime.Name}")
         };
@@ -678,7 +683,8 @@ public static class DateTimeOffsetExtension
     /// </returns>
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (DateTimeOffset startAt, DateTimeOffset endAt) ToWindow(this DateTimeOffset utcNow, int delay, int subtraction, UnitOfTime unitOfTime)
+    public static (DateTimeOffset startAt, DateTimeOffset endAt) ToWindow(this DateTimeOffset utcNow, int delay,
+        int subtraction, UnitOfTime unitOfTime)
     {
         DateTimeOffset endAt = utcNow.Subtract(delay, unitOfTime);
         DateTimeOffset startAt = endAt.Subtract(subtraction, unitOfTime);
@@ -702,7 +708,7 @@ public static class DateTimeOffsetExtension
             return dto;
 
         // Use floor so the fractional component is always in [0, 1) and sign behaves consistently.
-        int whole = (int)Math.Floor(months);
+        var whole = (int)Math.Floor(months);
         double frac = months - whole;
 
         dto = dto.AddMonths(whole);

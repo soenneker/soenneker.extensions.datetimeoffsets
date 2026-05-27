@@ -12,10 +12,10 @@ public sealed class DateTimeOffsetExtensionFormatTests : UnitTest
             OperatingSystem.IsWindows() ? "Eastern Standard Time" : "America/New_York");
 
     [Test]
-    public void ToHourFormat_throws_when_tz_is_null()
+    public void ToTzHourFormat_throws_when_tz_is_null()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 14, 30, 0, TimeSpan.Zero);
-        Assert.Throws<ArgumentNullException>(() => dto.ToHourFormat(null!));
+        Assert.Throws<ArgumentNullException>(() => dto.ToTzHourFormat(null!));
     }
 
     [Test]
@@ -137,19 +137,19 @@ public sealed class DateTimeOffsetExtensionFormatTests : UnitTest
     }
 
     [Test]
-    public void ToHourFormat_noon_in_UTC_shows_12_PM()
+    public void ToTzHourFormat_noon_in_UTC_shows_12_PM()
     {
         var dto = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
-        string result = dto.ToHourFormat(TimeZoneInfo.Utc);
+        string result = dto.ToTzHourFormat(TimeZoneInfo.Utc);
         result.Should().Contain("12");
         result.Should().Contain("PM");
     }
 
     [Test]
-    public void ToHourFormat_midnight_in_UTC_shows_12_AM()
+    public void ToTzHourFormat_midnight_in_UTC_shows_12_AM()
     {
         var dto = new DateTimeOffset(2024, 6, 16, 0, 0, 0, TimeSpan.Zero);
-        string result = dto.ToHourFormat(TimeZoneInfo.Utc);
+        string result = dto.ToTzHourFormat(TimeZoneInfo.Utc);
         result.Should().Contain("12");
         result.Should().Contain("AM");
     }
