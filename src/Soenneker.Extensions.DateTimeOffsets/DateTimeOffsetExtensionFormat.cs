@@ -29,6 +29,7 @@ public static class DateTimeOffsetExtensionFormat
     private const string _tzDateTimeFormat = "MM/dd/yyyy hh:mm:ss tt";
     private const string _tzDateFormat = "MM/dd/yyyy";
     private const string _tzDateHourFormat = "MM/dd/yyyy h tt";
+    private const string _tzDateHourMinuteFormat = "MM/dd/yyyy hh:mm tt";
     private const string _utcDateTimeFormat = "MM/dd/yyyy hh:mm:ss tt 'UTC'";
     private const string _fileNameFormat = "yyyy-MM-dd--HH-mm-ss";
     private const string _shortMonthDayYear = "MMM dd, yyyy";
@@ -154,6 +155,26 @@ public static class DateTimeOffsetExtensionFormat
         string abbr = tz.ToSimpleAbbreviation();
 
         return string.Concat(converted.ToString(_tzDateHourFormat, _invDtf), " ", abbr);
+    }
+
+    /// <summary>
+    /// Converts to <paramref name="tz"/> and formats as <c>MM/dd/yyyy hh:mm tt {tz}</c>.
+    /// </summary>
+    /// <param name="dateTimeOffset">The instant to format.</param>
+    /// <param name="tz">The time zone to convert into.</param>
+    /// <returns>A string in the form <c>MM/dd/yyyy h tt {tz}</c>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="tz"/> is <see langword="null"/>.</exception>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ToTzDateHourMinuteFormat(this DateTimeOffset dateTimeOffset, TimeZoneInfo tz)
+    {
+        if (tz is null)
+            throw new ArgumentNullException(nameof(tz));
+
+        DateTimeOffset converted = TimeZoneInfo.ConvertTime(dateTimeOffset, tz);
+        string abbr = tz.ToSimpleAbbreviation();
+
+        return string.Concat(converted.ToString(_tzDateHourMinuteFormat, _invDtf), " ", abbr);
     }
 
     /// <summary>
