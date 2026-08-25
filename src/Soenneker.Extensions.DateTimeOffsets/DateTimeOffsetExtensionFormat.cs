@@ -58,6 +58,22 @@ public static class DateTimeOffsetExtensionFormat
     private const string _fileNameFormat = "yyyy-MM-dd--HH-mm-ss";
     private const string _fileNameMillisFormat = "yyyy-MM-dd--HH-mm-ss-fff";
 
+    private static string FormatWithTimeZone(DateTimeOffset value, string format, TimeZoneInfo timeZone)
+    {
+        string abbreviation = timeZone.ToSimpleAbbreviation();
+        Span<char> formatted = stackalloc char[64];
+
+        if (!value.TryFormat(formatted, out int formattedLength, format, _invDtf))
+            return string.Concat(value.ToString(format, _invDtf), " ", abbreviation);
+
+        return string.Create(formattedLength + 1 + abbreviation.Length, (value, format, abbreviation), static (destination, state) =>
+        {
+            state.value.TryFormat(destination, out int written, state.format, _invDtf);
+            destination[written++] = ' ';
+            state.abbreviation.AsSpan().CopyTo(destination[written..]);
+        });
+    }
+
     /// <summary>
     /// Formats as <c>hh tt</c>.
     /// </summary>
@@ -382,7 +398,7 @@ public static class DateTimeOffsetExtensionFormat
         ArgumentNullException.ThrowIfNull(tz);
 
         DateTimeOffset converted = TimeZoneInfo.ConvertTime(value, tz);
-        return string.Concat(converted.ToString(_hour12PaddedFormat, _invDtf), " ", tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(converted, _hour12PaddedFormat, tz);
     }
 
     /// <summary>
@@ -399,7 +415,7 @@ public static class DateTimeOffsetExtensionFormat
         ArgumentNullException.ThrowIfNull(tz);
 
         DateTimeOffset converted = TimeZoneInfo.ConvertTime(value, tz);
-        return string.Concat(converted.ToString(_hour12MinuteFormat, _invDtf), " ", tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(converted, _hour12MinuteFormat, tz);
     }
 
     /// <summary>
@@ -416,7 +432,7 @@ public static class DateTimeOffsetExtensionFormat
         ArgumentNullException.ThrowIfNull(tz);
 
         DateTimeOffset converted = TimeZoneInfo.ConvertTime(value, tz);
-        return string.Concat(converted.ToString(_hour12MinuteSecondFormat, _invDtf), " ", tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(converted, _hour12MinuteSecondFormat, tz);
     }
 
     /// <summary>
@@ -433,7 +449,7 @@ public static class DateTimeOffsetExtensionFormat
         ArgumentNullException.ThrowIfNull(tz);
 
         DateTimeOffset converted = TimeZoneInfo.ConvertTime(value, tz);
-        return string.Concat(converted.ToString(_hour24Format, _invDtf), " ", tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(converted, _hour24Format, tz);
     }
 
     /// <summary>
@@ -450,7 +466,7 @@ public static class DateTimeOffsetExtensionFormat
         ArgumentNullException.ThrowIfNull(tz);
 
         DateTimeOffset converted = TimeZoneInfo.ConvertTime(value, tz);
-        return string.Concat(converted.ToString(_hour24MinuteFormat, _invDtf), " ", tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(converted, _hour24MinuteFormat, tz);
     }
 
     /// <summary>
@@ -467,7 +483,7 @@ public static class DateTimeOffsetExtensionFormat
         ArgumentNullException.ThrowIfNull(tz);
 
         DateTimeOffset converted = TimeZoneInfo.ConvertTime(value, tz);
-        return string.Concat(converted.ToString(_hour24MinuteSecondFormat, _invDtf), " ", tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(converted, _hour24MinuteSecondFormat, tz);
     }
 
     /// <summary>
@@ -535,7 +551,7 @@ public static class DateTimeOffsetExtensionFormat
         ArgumentNullException.ThrowIfNull(tz);
 
         DateTimeOffset converted = TimeZoneInfo.ConvertTime(value, tz);
-        return string.Concat(converted.ToString(_dateHour12Format, _invDtf), " ", tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(converted, _dateHour12Format, tz);
     }
 
     /// <summary>
@@ -552,7 +568,7 @@ public static class DateTimeOffsetExtensionFormat
         ArgumentNullException.ThrowIfNull(tz);
 
         DateTimeOffset converted = TimeZoneInfo.ConvertTime(value, tz);
-        return string.Concat(converted.ToString(_dateHour12MinuteFormat, _invDtf), " ", tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(converted, _dateHour12MinuteFormat, tz);
     }
 
     /// <summary>
@@ -569,8 +585,7 @@ public static class DateTimeOffsetExtensionFormat
         ArgumentNullException.ThrowIfNull(tz);
 
         DateTimeOffset converted = TimeZoneInfo.ConvertTime(value, tz);
-        return string.Concat(converted.ToString(_dateHour12MinuteSecondFormat, _invDtf), " ",
-            tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(converted, _dateHour12MinuteSecondFormat, tz);
     }
 
     /// <summary>
@@ -587,7 +602,7 @@ public static class DateTimeOffsetExtensionFormat
         ArgumentNullException.ThrowIfNull(tz);
 
         DateTimeOffset converted = TimeZoneInfo.ConvertTime(value, tz);
-        return string.Concat(converted.ToString(_dateHour24MinuteFormat, _invDtf), " ", tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(converted, _dateHour24MinuteFormat, tz);
     }
 
     /// <summary>
@@ -604,8 +619,7 @@ public static class DateTimeOffsetExtensionFormat
         ArgumentNullException.ThrowIfNull(tz);
 
         DateTimeOffset converted = TimeZoneInfo.ConvertTime(value, tz);
-        return string.Concat(converted.ToString(_dateHour24MinuteSecondFormat, _invDtf), " ",
-            tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(converted, _dateHour24MinuteSecondFormat, tz);
     }
 
     /// <summary>
@@ -623,7 +637,7 @@ public static class DateTimeOffsetExtensionFormat
         ArgumentNullException.ThrowIfNull(tz);
 
         DateTimeOffset converted = TimeZoneInfo.ConvertTime(value, tz);
-        return string.Concat(converted.ToString(_sortableMinuteFormat, _invDtf), " ", tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(converted, _sortableMinuteFormat, tz);
     }
 
     /// <summary>
@@ -641,7 +655,7 @@ public static class DateTimeOffsetExtensionFormat
         ArgumentNullException.ThrowIfNull(tz);
 
         DateTimeOffset converted = TimeZoneInfo.ConvertTime(value, tz);
-        return string.Concat(converted.ToString(_sortableSecondFormat, _invDtf), " ", tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(converted, _sortableSecondFormat, tz);
     }
 
     /// <summary>
@@ -801,7 +815,7 @@ public static class DateTimeOffsetExtensionFormat
     {
         ArgumentNullException.ThrowIfNull(tz);
 
-        return string.Concat(value.ToString(_dateHour12MinuteSecondFormat, _invDtf), " ", tz.ToSimpleAbbreviation());
+        return FormatWithTimeZone(value, _dateHour12MinuteSecondFormat, tz);
     }
 
     /// <summary>
