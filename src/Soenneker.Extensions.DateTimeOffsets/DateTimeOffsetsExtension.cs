@@ -606,8 +606,7 @@ public static class DateTimeOffsetExtension
     /// The local date is determined by converting <paramref name="utcNow"/> into <paramref name="tz"/> and using that local date.
     /// </para>
     /// <para>
-    /// If the requested local time falls into a DST gap (invalid local time), this advances minute-by-minute to the next valid time
-    /// with a safety cap to avoid pathological looping.
+    /// If the requested local time falls into a time-zone gap (invalid local time), this advances minute-by-minute to the next valid time.
     /// </para>
     /// <para>
     /// If the requested local time is ambiguous (DST fold), this chooses the earlier UTC instant (which corresponds to the larger offset).
@@ -638,21 +637,9 @@ public static class DateTimeOffsetExtension
         // Construct the local wall-clock time (Kind must be Unspecified for TZ conversion APIs).
         DateTime local = new(localNow.Year, localNow.Month, localNow.Day, tzHour, 0, 0, DateTimeKind.Unspecified);
 
-        // If invalid (spring-forward gap), advance until valid (cap to avoid pathological loops).
-        if (tz.IsInvalidTime(local))
-        {
-            const int maxMinutes = 180; // DST gaps are typically <= 120 minutes; cap provides safety.
-            int i = 0;
-
-            do
-            {
-                local = local.AddMinutes(1);
-                i++;
-                if (i > maxMinutes)
-                    break;
-            }
-            while (tz.IsInvalidTime(local));
-        }
+        // Civil-time discontinuities can exceed ordinary DST gaps, including skipped calendar dates.
+        while (tz.IsInvalidTime(local))
+            local = local.AddMinutes(1);
 
         // If ambiguous (fall-back fold), choose the earlier UTC instant.
         // Earlier UTC instant corresponds to the *larger* offset (local - offset = utc).

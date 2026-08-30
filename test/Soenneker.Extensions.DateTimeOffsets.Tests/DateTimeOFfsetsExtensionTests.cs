@@ -263,6 +263,22 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     }
 
     [Test]
+    public void ToUtcHoursFromTz_advances_through_gaps_longer_than_three_hours()
+    {
+        TimeZoneInfo.TransitionTime start = TimeZoneInfo.TransitionTime.CreateFixedDateRule(new DateTime(1, 1, 1, 0, 0, 0), 6, 1);
+        TimeZoneInfo.TransitionTime end = TimeZoneInfo.TransitionTime.CreateFixedDateRule(new DateTime(1, 1, 1, 0, 0, 0), 10, 1);
+        TimeZoneInfo.AdjustmentRule rule = TimeZoneInfo.AdjustmentRule.CreateAdjustmentRule(
+            new DateTime(2024, 1, 1), new DateTime(2024, 12, 31), TimeSpan.FromHours(4), start, end);
+        TimeZoneInfo zone = TimeZoneInfo.CreateCustomTimeZone(
+            "FourHourGap", TimeSpan.Zero, "Four-hour gap", "Standard", "Daylight", [rule]);
+        var reference = new DateTimeOffset(2024, 6, 1, 6, 0, 0, TimeSpan.Zero);
+
+        int result = reference.ToUtcHoursFromTz(0, zone);
+
+        result.Should().Be(0);
+    }
+
+    [Test]
     public void ToWindow_delay_and_subtraction_applied()
     {
         var now = new DateTimeOffset(2024, 6, 15, 12, 0, 0, TimeSpan.Zero);
