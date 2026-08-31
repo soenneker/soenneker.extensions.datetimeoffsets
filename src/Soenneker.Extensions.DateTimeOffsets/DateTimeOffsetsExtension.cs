@@ -349,6 +349,90 @@ public static class DateTimeOffsetExtension
     }
 
     /// <summary>
+    /// Returns the next business date, strictly after the supplied value, skipping weekend days according to the supplied time zone and culture.
+    /// </summary>
+    /// <param name="dateTimeOffset">The starting instant.</param>
+    /// <param name="zone">
+    /// The time zone whose local calendar should be used when deciding if a day is a weekend.
+    /// If <see langword="null"/>, no conversion is performed.
+    /// </param>
+    /// <param name="culture">
+    /// The culture used to determine weekend days. If <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> is used.
+    /// </param>
+    /// <returns>The next business date, with the original time and offset preserved.</returns>
+    [Pure]
+    public static DateTimeOffset ToNextBusinessDate(this DateTimeOffset dateTimeOffset, TimeZoneInfo? zone = null,
+        CultureInfo? culture = null)
+    {
+        CultureInfo resolvedCulture = culture ?? CultureInfo.CurrentCulture;
+        DayOfWeek day = zone is null ? dateTimeOffset.DayOfWeek : TimeZoneInfo.ConvertTime(dateTimeOffset, zone).DayOfWeek;
+
+        return dateTimeOffset.AddDays(GetBusinessDateDelta(day, next: true, resolvedCulture));
+    }
+
+    /// <summary>
+    /// Returns the previous business date, strictly before the supplied value, skipping weekend days according to the supplied time zone and culture.
+    /// </summary>
+    /// <param name="dateTimeOffset">The starting instant.</param>
+    /// <param name="zone">
+    /// The time zone whose local calendar should be used when deciding if a day is a weekend.
+    /// If <see langword="null"/>, no conversion is performed.
+    /// </param>
+    /// <param name="culture">
+    /// The culture used to determine weekend days. If <see langword="null"/>, <see cref="CultureInfo.CurrentCulture"/> is used.
+    /// </param>
+    /// <returns>The previous business date, with the original time and offset preserved.</returns>
+    [Pure]
+    public static DateTimeOffset ToPreviousBusinessDate(this DateTimeOffset dateTimeOffset, TimeZoneInfo? zone = null,
+        CultureInfo? culture = null)
+    {
+        CultureInfo resolvedCulture = culture ?? CultureInfo.CurrentCulture;
+        DayOfWeek day = zone is null ? dateTimeOffset.DayOfWeek : TimeZoneInfo.ConvertTime(dateTimeOffset, zone).DayOfWeek;
+
+        return dateTimeOffset.AddDays(GetBusinessDateDelta(day, next: false, resolvedCulture));
+    }
+
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int GetBusinessDateDelta(DayOfWeek day, bool next, CultureInfo culture)
+    {
+        bool usesFriSatWeekend = culture.UsesFriSatWeekend();
+
+        if (next)
+        {
+            if (usesFriSatWeekend)
+                return day switch
+                {
+                    DayOfWeek.Thursday => 3,
+                    DayOfWeek.Friday => 2,
+                    _ => 1
+                };
+
+            return day switch
+            {
+                DayOfWeek.Friday => 3,
+                DayOfWeek.Saturday => 2,
+                _ => 1
+            };
+        }
+
+        if (usesFriSatWeekend)
+            return day switch
+            {
+                DayOfWeek.Sunday => -3,
+                DayOfWeek.Saturday => -2,
+                _ => -1
+            };
+
+        return day switch
+        {
+            DayOfWeek.Monday => -3,
+            DayOfWeek.Sunday => -2,
+            _ => -1
+        };
+    }
+
+    /// <summary>
     /// Determines whether <paramref name="value"/> is between <paramref name="start"/> and <paramref name="end"/>.
     /// </summary>
     /// <param name="value">The value to test.</param>

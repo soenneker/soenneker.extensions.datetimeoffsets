@@ -125,6 +125,37 @@ public sealed class DateTimeOFfsetsExtensionTests : UnitTest
     }
 
     [Test]
+    public void ToNextBusinessDate_from_friday_returns_monday_and_preserves_time_and_offset()
+    {
+        var friday = new DateTimeOffset(2024, 6, 14, 12, 30, 0, TimeSpan.FromHours(-4));
+
+        DateTimeOffset result = friday.ToNextBusinessDate(culture: CultureInfo.InvariantCulture);
+
+        result.Should().Be(new DateTimeOffset(2024, 6, 17, 12, 30, 0, TimeSpan.FromHours(-4)));
+    }
+
+    [Test]
+    public void ToPreviousBusinessDate_from_monday_returns_friday_and_preserves_time_and_offset()
+    {
+        var monday = new DateTimeOffset(2024, 6, 17, 12, 30, 0, TimeSpan.FromHours(-4));
+
+        DateTimeOffset result = monday.ToPreviousBusinessDate(culture: CultureInfo.InvariantCulture);
+
+        result.Should().Be(new DateTimeOffset(2024, 6, 14, 12, 30, 0, TimeSpan.FromHours(-4)));
+    }
+
+    [Test]
+    public void BusinessDate_methods_support_friday_saturday_weekends()
+    {
+        CultureInfo culture = CultureInfo.GetCultureInfo("ar-SA");
+        var thursday = new DateTimeOffset(2024, 6, 13, 12, 30, 0, TimeSpan.Zero);
+        var sunday = new DateTimeOffset(2024, 6, 16, 12, 30, 0, TimeSpan.Zero);
+
+        thursday.ToNextBusinessDate(culture: culture).Should().Be(sunday);
+        sunday.ToPreviousBusinessDate(culture: culture).Should().Be(thursday);
+    }
+
+    [Test]
     public void IsBetween_reversed_start_end_swaps_internally()
     {
         var start = new DateTimeOffset(2024, 6, 20, 0, 0, 0, TimeSpan.Zero);
