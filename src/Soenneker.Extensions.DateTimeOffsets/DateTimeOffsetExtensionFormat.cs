@@ -18,7 +18,6 @@ public static class DateTimeOffsetExtensionFormat
 {
     private static readonly DateTimeFormatInfo _invDtf = DateTimeFormatInfo.InvariantInfo;
 
-    private const string _hour12Format = "h tt";
     private const string _hour12PaddedFormat = "hh tt";
     private const string _hour12MinuteFormat = "h:mm tt";
     private const string _hour12MinuteSecondFormat = "h:mm:ss tt";
