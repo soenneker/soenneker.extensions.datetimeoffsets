@@ -335,6 +335,21 @@ public static class DateTimeOffsetExtension
 
         DateTimeOffset current = dateTimeOffset;
 
+        if (zone is null && remaining >= 5)
+        {
+            // Anchor on a business day before skipping complete five-day work weeks.
+            do
+            {
+                current = current.AddDays(direction);
+            }
+            while (weekendDays.Contains(current.DayOfWeek));
+
+            remaining--;
+            int wholeWeeks = remaining / 5;
+            current = current.AddDays((long)direction * wholeWeeks * 7);
+            remaining %= 5;
+        }
+
         while (remaining > 0)
         {
             current = current.AddDays(direction);
@@ -719,7 +734,7 @@ public static class DateTimeOffsetExtension
         DateTimeOffset localNow = TimeZoneInfo.ConvertTime(utcNow, tz);
 
         // Construct the local wall-clock time (Kind must be Unspecified for TZ conversion APIs).
-        DateTime local = new(localNow.Year, localNow.Month, localNow.Day, tzHour, 0, 0, DateTimeKind.Unspecified);
+        DateTime local = localNow.Date.AddHours(tzHour);
 
         // Civil-time discontinuities can exceed ordinary DST gaps, including skipped calendar dates.
         while (tz.IsInvalidTime(local))

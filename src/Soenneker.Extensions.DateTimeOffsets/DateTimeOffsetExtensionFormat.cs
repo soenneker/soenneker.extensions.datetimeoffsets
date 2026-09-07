@@ -65,12 +65,7 @@ public static class DateTimeOffsetExtensionFormat
         if (!value.TryFormat(formatted, out int formattedLength, format, _invDtf))
             return string.Concat(value.ToString(format, _invDtf), " ", abbreviation);
 
-        return string.Create(formattedLength + 1 + abbreviation.Length, (value, format, abbreviation), static (destination, state) =>
-        {
-            state.value.TryFormat(destination, out int written, state.format, _invDtf);
-            destination[written++] = ' ';
-            state.abbreviation.AsSpan().CopyTo(destination[written..]);
-        });
+        return string.Concat(formatted[..formattedLength], " ", abbreviation);
     }
 
     /// <summary>
